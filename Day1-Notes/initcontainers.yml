@@ -1,0 +1,20 @@
+---
+kind: Pod
+apiVersion: v1
+metadata:
+ name: inticont
+ labels: # labels are used for grouping similar objects 
+  author: sonal
+  env: dev
+spec:
+ restartPolicy: Always
+ initContainers:
+  - name: initcont1
+    image: ubuntu
+    command: ["bash", "-c", "sleep 10"]
+  - name: initcont2
+    image: centos
+    command: ["bash", "-c", "sleep 5"]
+ containers:
+  - name: c1
+    image: httpd
