@@ -1,0 +1,18 @@
+kind: ReplicaSet
+apiVersion: apps/v1
+metadata:
+ name: myrs1
+spec:
+ replicas: 3  # identical pods
+ selector:
+  matchLabels:
+   type: webserver
+ template:  # this is pod template
+  metadata:
+   labels:
+    type: webserver
+    env: dev
+   spec:
+    containers:
+     - name: c1
+       image: httpd
