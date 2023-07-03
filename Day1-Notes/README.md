@@ -76,6 +76,25 @@ kubectl create -f https://raw.githubusercontent.com/Sonal0409/Vodafone-Kubernete
 
 kubectl get pods
 
+===========================================
+ReplicaSet Demo
+===========================================
+
+kubectl create -f https://raw.githubusercontent.com/Sonal0409/Vodafone-Kubernetes-Notes/main/Day1-Notes/ReplicaSet.yml
+
+kubectl get pods
+
+kubectl get pods --show-labels
+
+kubectl get pods -l type=webserver
+
+kubectl get all
+
+kubectl scale --replicas=5 replicaset myrs1
+
+kubectl scale --replicas=2 replicaset myrs1
+
+kubectl delete replicaset myrs1
 
 
 
