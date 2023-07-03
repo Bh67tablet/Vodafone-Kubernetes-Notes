@@ -40,20 +40,7 @@ Create  a file with name as
 
 vim static-pod.yml
 
-Copy the text from master machine(static-pod.yml file) into this file
-
----
-apiVersion: v1
-kind: Pod
-metadata:
- name: static-pod
- lablels:
-   run: static-pod
-spec:
- containers:
-  - name: static-container
-    image: nginx
-...
+Copy the text given in this file : https://raw.githubusercontent.com/Sonal0409/Vodafone-Kubernetes-Notes/main/Day1-Notes/Static-pod.yml
 
 Save the file (:wq!)
 
