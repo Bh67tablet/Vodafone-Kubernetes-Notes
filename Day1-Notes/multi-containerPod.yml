@@ -1,0 +1,16 @@
+kind: Pod  # kubectl api-resources
+apiVersion: v1
+metadata:
+  name: multi-cont-pod2
+  namespace: default
+  labels:  # are mandatory # helps to indentify a group of pods in cluster # in kube if you do not provide a label kube will assing one automatically
+    role: dev  # here both key & value are your choice
+spec:
+  containers:
+    - name: cont1
+      image: httpd
+    - name: cont2
+      image: tomcat
+    - name: ucont
+      image: ubuntu
+      command: ["bash", "-c", "sleep 6000"]
