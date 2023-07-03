@@ -42,6 +42,7 @@ vim static-pod.yml
 
 Copy the text from master machine(static-pod.yml file) into this file
 
+---
 apiVersion: v1
 kind: Pod
 metadata:
@@ -52,7 +53,7 @@ spec:
  containers:
   - name: static-container
     image: nginx
-
+...
 
 Save the file (:wq!)
 
