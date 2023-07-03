@@ -45,7 +45,6 @@ Copy the text from master machine(static-pod.yml file) into this file
 apiVersion: v1
 kind: Pod
 metadata:
-  creationTimestamp: null
   labels:
     run: static-pod
   name: static-pod
