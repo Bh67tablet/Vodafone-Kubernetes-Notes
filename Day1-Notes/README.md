@@ -45,13 +45,13 @@ Copy the text from master machine(static-pod.yml file) into this file
 apiVersion: v1
 kind: Pod
 metadata:
-  labels:
-    run: static-pod
-  name: static-pod
+ name: static-pod
+ lablels:
+   run: static-pod
 spec:
-  containers:
-  - image: nginx
-    name: static-pod
+ containers:
+  - name: static-container
+    image: nginx
 
 
 Save the file (:wq!)
