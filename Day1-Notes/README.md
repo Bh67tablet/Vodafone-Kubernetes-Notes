@@ -69,6 +69,14 @@ rm static-pod.yml
 go to master and check the if pod is available or not
 
 =====================================
+Init-Containers Demo
+==============================
+
+kubectl create -f https://raw.githubusercontent.com/Sonal0409/Vodafone-Kubernetes-Notes/main/Day1-Notes/initcontainers.yml
+
+kubectl get pods
+
+
 
 
 
