@@ -2,25 +2,25 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: postgress
-  name: postgress
+    app: postgres
+  name: postgres
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgress
+      app: postgres
   template:
     metadata:
       labels:
-        app: postgress
+        app: postgres
     spec:
       containers:
-      - image: postgress
-        name: postgress
+      - image: postgres
+        name: postgres
         env:
-         - name: POSTGRESS_PASSWORD
+         - name: POSTGRES_PASSWORD
            value: simplilearn
-         - name: POSTGRESS_DB
+         - name: POSTGRES_DB
            value: database1 
-        
+
 
