@@ -7,7 +7,7 @@ kubectl delete all --all
 
 Create Replicas using ReplicaSet YAML file
 ===========================================
-https://raw.githubusercontent.com/Sonal0409/Vodafone-Kubernetes-Notes/main/Day2-Notes/Service/ClusterIPDemo/ReplicaSet.ymlkubectl create -f 
+kubectl create -f  https://raw.githubusercontent.com/Sonal0409/Vodafone-Kubernetes-Notes/main/Day2-Notes/Service/ClusterIPDemo/ReplicaSet.yml
 
 kubectl get pods
 
