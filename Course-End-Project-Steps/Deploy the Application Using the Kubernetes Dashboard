@@ -1,0 +1,237 @@
+Step 1: Deploy the dashboard
+
+kubectl create -f https://raw.githubusercontent.com/sonal0409ORG/educka/master/dashboard/dashboard-insecure-v2.4.0.yml
+
+Step 2: Create a namespace cep-project1
+
+kubectl create namespace cep-project1 -l slearn=project1
+
+Step 3: Create a service Account with name as Sandry and namespace = cep-project1
+
+kubectl create serviceaccount sandry --namespace cep-project1
+ 
+Step 4: Create a cluster role binding to the service account Sandry and give access as cluster admin role 
+
+kubectl create clusterrolebinding sandry-access --serviceaccount=cep-project1:sandry --clusterrole=cluster-admin
+
+Step 5: Prepare master node to be NFS server and worker node2 to be the NFS client
+
+NFS server on Master Node:
+
+Execute below steps on Master node:
+
+sudo mkdir /data
+
+Install the NFS kernel server on the machine
+
+sudo apt install nfs-kernel-server
+
+
+Change the owner user and group to nobody and nogroup
+...
+
+sudo chown nobody:nogroup /data/
+
+Set permissions to 777 to allow everyone to read, write, and execute files in this directory
+
+sudo chmod 777 /data/
+
+
+Open the exports file in the /etc directory for permission to access the host server machine
+
+...
+
+sudo vi /etc/exports
+
+Add the following code to the file:
+
+/data *(rw,sync,no_root_squash)
+
+Note: Exit the file and save the changes
+
+...
+
+
+
+Use the exportfs command to export all shared folders you registered in the /etc/exports file after making the appropriate changes
+
+sudo exportfs -rv
+
+
+Restart the NFS kernel server to apply the configuration changes
+
+sudo systemctl restart nfs-kernel-server
+
+
+Deploy NFS client on worker nodes
+
+sudo apt install nfs-common
+
+===================
+
+Deployment for mysql application
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-nfs
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /data
+    server: 172.31.49.155
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mysql-nfs
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql-wordpress
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: mysql-wordpress
+    product: mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql-wordpress
+spec:
+  selector:
+    matchLabels:
+      app: mysql-wordpress
+      product: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql-wordpress
+        product: mysql
+    spec:
+      containers:
+      - image: mysql
+        name: mysql-container
+        env:
+        - name: MYSQL_DATABASE
+          value: wordpress
+        - name: MYSQL_ROOT_PASSWORD
+          value: password 
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-storage
+        persistentVolumeClaim:
+          claimName: mysql-nfs
+
+
+Wordpress Deployment:
+====================
+
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hostpath-pv
+  labels:
+    type: hostpath
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Delete
+  hostPath:
+    type: DirectoryOrCreate
+    path: "/opt/wordpress"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: wordpress-hostpath
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    app: mysql-wordpress
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: mysql-wordpress
+    tier: frontend
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: mysql-wordpress
+spec:
+  selector:
+    matchLabels:
+      app: mysql-wordpress
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql-wordpress
+        tier: frontend
+    spec:
+      containers:
+      - image: wordpress
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: mysql
+        - name: WORDPRESS_DB_USER
+          value: root
+        - name: WORDPRESS_DB_PASSWORD
+          value: password
+        ports:
+        - containerPort: 80
+          name: wordpress
+        volumeMounts:
+        - name: wordpress-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: wordpress-storage
+        persistentVolumeClaim:
+          claimName: wordpress-hostpath
