@@ -1,0 +1,200 @@
+sudo kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
+
+Steps to Execute Project2 - Kubernetes:
+=====================================
+
+# kubectl get pods -n kube-system
+
+Get the ip address of etcd pod
+
+# kubectl get pods -n kube-system -o wide
+
+Ip address of etcd pod :172.31.57.157
+
+Install etcdctl:
+   export RELEASE="3.3.13"
+   wget https://github.com/etcd-io/etcd/releases/download/v${RELEASE}/etcd-v${RELEASE}-linux-amd64.tar.gz
+   tar xvf etcd-v${RELEASE}-linux-amd64.tar.gz
+   cd etcd-v${RELEASE}-linux-amd64
+   sudo mv etcdctl /usr/local/bin
+
+
+
+mkdir /tmp/myback
+
+cd /tmp/myback
+
+sudo ETCDCTL_API=3 etcdctl --endpoints=172.31.57.157:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key snapshot save /tmp/myback/etcd-snapshot-latest.db
+
+Backup will be available in the current directory
+
+TASK 1 complete.
+
+Extra:
+
+Restoring the data
+
+deleet the director /var/lib/etcd
+
+# rm -rf /var/lib/etcd
+
+
+Restore the data using below command:
+
+
+sudo ETCDCTL_API=3 etcdctl snapshot restore /tmp/myback/etcd-snapshot-latest.db --initial-cluster etcd-restore=https://172.31.57.157:2380 --initial-advertise-peer-urls=https://172.31.57.157:2380 --name etcd-restore --data-dir /var/lib/etcd
+
+***************************************************
+
+Task 2: Create a namespace in kubernetes
+
+# kubectl create namespace cep-project2
+
+# kubectl label namespace cep-project2 slearn=cep-project2
+
+
+***************************************************
+
+Task 3: Create a network policy to allow all pods in teh namespace cep-project2
+
+
+# vim networkpolicy.yml
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+ name: allow-traffic-in-ns
+ namespace: cep-project2
+spec:
+ podSelector: {}
+ policyTypes:
+  - Ingress
+ ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          slearn: cep-project2
+
+
+# kubectl apply -f networkpolicy.yml
+
+# kubectl get netpol -n cep-project2
+
+********************************************************
+
+Task 4: 
+
+
+mkdir cep-project2
+
+cd cep-project2
+
+sudo openssl genrsa -out user3.key 2048
+
+sudo openssl req -new -key user3.key -out user3.csr
+
+sudo openssl x509 -req -in user3.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out user3.crt -days 500
+
+vim role.yml
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+   namespace: cep-project2
+   name: user3-role
+rules:
+- apiGroups: ["", "extensions", "apps"]
+  resources: ["deployments", "pods", "services"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+kubectl create -f role.yml
+
+Create a rolebinding for above role:
+
+# vim rolebinding.yml
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: role-test
+ namespace: cep-project2
+subjects:
+- kind: User
+  name: user3
+  apiGroup: ""
+roleRef:
+  kind: Role
+  name: user3-role
+  apiGroup: ""
+
+# kubectl create -f rolebinding.yml
+
+Give credentials to user:
+
+kubectl config set-credentials user3 --client-certificate=/home/labsuser/cep-project2/user3.crt --client-key=/home/labsuser/cep-project2/user3.key
+
+Set context to user3.
+kubectl config set-context user3-context --cluster=kubernetes --namespace=role --user=user3
+
+Run the following command to display current contexts:
+kubectl config get-contexts
+
+Copying the config file to the client machine
+Copy the config file from the master node in the home directory to the worker node.
+
+cd ..
+
+cat .kube/config
+
+Paste the copied config file into the client machine in root directory iteself.
+vi myconf
+
+copy the master config file contents to this file
+
+In the worker node
+create a role directory
+
+mkdir cep-project2
+
+cd cep-project2
+
+Copy the crt and key files from the master node to the worker node in the /role directory.
+
+keep the filename same as on master node
+
+vim user3.crt
+
+vim user3.key
+
+Locate the home directory.
+cd ..
+
+Run the following commands to verify roles we have generated:
+kubectl get pods --kubeconfig=myconf
+
+kubectl create deployment test --image=docker.io/httpd -n role --kubeconfig=myconf
+
+kubectl get pods --kubeconfig=myconf
+
+*******************************************
+
+1) Determine which version to upgrade to
+
+$ apt update
+$ apt-cache madison kubeadm
+
+2) On the control plane node, run:
+
+$ kubeadm upgrade plan
+
+3) Upgrading kubeadm tool
+
+$ apt-mark unhold kubeadm && apt-get update && apt-get install -y kubeadm=1.23.11-00 && apt-mark hold kubeadm
+
+$ kubeadm version
+
+
+
+
+
+
