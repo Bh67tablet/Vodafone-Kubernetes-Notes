@@ -4,9 +4,9 @@ Create the deployment and service object
 # kubectl create -f https://raw.githubusercontent.com/Sonal0409/Vodafone-Kubernetes-Notes/main/Day2-Notes/Deployment/deployment.yml
 ...
 
-# kubectl get deployment --all
+# kubectl get deployment 
 
-# kubectl get service --all
+# kubectl get service 
 
 # kubectl get pods
 
