@@ -37,7 +37,7 @@ Run the loop to send continous request to service object
 
 Go to worker node and execute below command:
 
-while true;do curl <serviceClusterIP>:80;sleep 1;echo"";done
+while true;do curl serviceClusterIP:80;sleep 1;echo"";done
 
 example:
 while true;do curl 10.102.253.113:80;sleep 1;echo"";done
