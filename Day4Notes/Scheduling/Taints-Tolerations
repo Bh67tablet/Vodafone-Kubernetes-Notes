@@ -1,10 +1,34 @@
-On the master node taint one of the node
+
+Create a replica Set, pods may be scheduled on worker1 and worker2
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+ name: myrs
+spec:
+ replicas: 3
+ selector:
+  matchLabels:
+   type: webserver
+ template:
+  metadata:
+   labels:
+    type: webserver
+  spec:
+   containers:
+    - name: c1
+      image: nginx
+
+
+On the master node taint one of the node - worker1
 
 kubectl taint node gke-cluster-1-default-pool-7fe774cd-0m0q color=red:NoSchedule
 
 This node will be tainted
 
-Now try to create any replicas of deployment, no pod will be scehduled on the tainted node.
+Scale up the replicas, no pod will be scehduled on the tainted node.
+
+# kubectl scale replicaset myrs --replicas=6
 
 This is tainting. 
 
@@ -20,12 +44,6 @@ NoExecute
 
 Example of NoExecute : in this case the running pods on the node that is tainted will leave the node and get created somewhere else
 No new pod will be scheduled on the taineted node as No execute.
-
-example:
-
-Create some replicas and deployemnts, so that pods are there on all nodes
-
-kubectl create -f deployment.yml
 
 Now taint one of the node as :
 
