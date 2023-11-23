@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+ name: with-node-affinity
+spec:
+ affinity:
+  nodeAffinity:
+   requiredDuringSchedulingIgnoredDuringExecution:
+    nodeSelectorTerms:
+    - matchExpressions:
+       - key: disk
+         operator: In
+         values:
+          - hdd
+ containers:
+  - name: c1
+    image: nginx
+
+
+requiredDuringSchedulingIgnoredDuringExecution
+=====================================================
+when the pod is getting sceduled, this label should match on the worker node
+The pod has been scehdule don the node with label as disk=ssd
+After sometime, the lable on the node is chnaged form disk=hdd
+
+Now it is okay, the pod can continue to run
+
+Now chnage the label on the node, still the pod will continue to run
+kubectl label node  ip-172-31-36-30 --overwrite disk=hdd123
