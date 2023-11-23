@@ -27,3 +27,55 @@ Now it is okay, the pod can continue to run
 
 Now chnage the label on the node, still the pod will continue to run
 kubectl label node  ip-172-31-36-30 --overwrite disk=hdd123
+
+
+=============================================
+
+Chnage the label on node 1 as below:
+
+kubectl label node  ip-172-31-36-30 --overwrite disk=ssd
+
+Now both your worker nodes have 1 label which is common
+
+Worker 1 and worker 2 have common label as disk=ssd
+
+Worker 1 has a different label as name=Worker1
+Worker 2 has a different label as name=Worker2
+===============================================
+
+apiVersion: v1
+kind: Pod
+metadata:
+ name: with-node-affinity
+spec:
+ affinity:
+  nodeAffinity:
+   requiredDuringSchedulingIgnoredDuringExecution:
+    nodeSelectorTerms:
+    - matchExpressions:
+       - key: disk
+         operator: In
+         values:
+          - ssd
+   preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 1
+      preference:
+       matchExpressions:
+        - key: name
+          operator: In
+          values:
+           - Worker1
+    - weight: 50
+      preference:
+       matchExpressions:
+        - key: name
+          operator: In
+          values:
+           - Worker2
+
+ containers:
+  - name: c1
+    image: nginx
+
+
+
