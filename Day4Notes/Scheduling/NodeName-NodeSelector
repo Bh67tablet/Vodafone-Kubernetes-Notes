@@ -33,6 +33,8 @@ you will see both the pod is scheduled on your mentioned node
 Node Selector:
 ************************
 
+# kubectl delete deployment --all
+
 $ kubectl get nodes
 
 every node has multiple labels:
