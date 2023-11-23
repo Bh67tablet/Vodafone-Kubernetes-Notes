@@ -76,6 +76,12 @@ spec:
  containers:
   - name: c1
     image: nginx
+=============================
 
+To remove a label from node:
+
+# kubectl label node  ip-172-31-36-30 disk-
+
+node/ip-172-31-36-30 unlabeled
 
 
