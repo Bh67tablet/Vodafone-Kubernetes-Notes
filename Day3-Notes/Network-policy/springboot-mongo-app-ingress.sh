@@ -6,5 +6,6 @@ kubectl get services springboot-app-svc
 kubectl apply -f allow-ingress-to-springapp-from-all.yaml
 kubectl get services springboot-app-svc
 kubectl apply -f allow-ingress-to-mongodb-from-springapp.yaml
+kubectl get all
 read a
 kubectl delete pods,services,deployment,replicaset --all
