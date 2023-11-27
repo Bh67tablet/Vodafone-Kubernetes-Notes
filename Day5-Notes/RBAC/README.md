@@ -113,7 +113,31 @@ kubectl get deployment --kubeconfig=myconf
 The worker node can create, update, remove, and list pods, services, and deployments after using the master config settings.
 
 
+========================
 
+Next Steps:
+
+
+
+1. View Kubeconfig
+
+kubectl config --kubeconfig=base-config view
+
+
+
+2. Get current conext information:
+
+kubectl config --kubeconfig=base-config get-contexts
+
+
+
+3. Switch Conexts:
+
+kubectl config --kubeconfig=base-config use-context dev-frontend
+
+4. Deletion
+
+kubectl config delete-context my-cluster-context
 
 
 
