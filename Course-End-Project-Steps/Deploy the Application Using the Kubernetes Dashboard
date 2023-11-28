@@ -4,7 +4,7 @@ kubectl create -f https://raw.githubusercontent.com/sonal0409ORG/educka/master/d
 
 Step 2: Create a namespace cep-project1
 
-kubectl create namespace cep-project1 -l slearn=project1
+kubectl create namespace cep-project1 
 
 Step 3: Create a service Account with name as Sandry and namespace = cep-project1
 
@@ -24,6 +24,7 @@ sudo mkdir /data
 
 Install the NFS kernel server on the machine
 
+sudo apt update
 sudo apt install nfs-kernel-server
 
 
@@ -64,7 +65,7 @@ sudo systemctl restart nfs-kernel-server
 
 
 Deploy NFS client on worker nodes
-
+sudo apt update
 sudo apt install nfs-common
 
 ===================
