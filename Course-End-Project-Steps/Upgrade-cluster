@@ -1,0 +1,146 @@
+Upgrading Control Plane's Kubernetes Versions  
+Reference:
+Master Upgrade - https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/
+Worker Node upgrade - https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/upgrading-linux-nodes/
+
+Steps to be followed: 
+1.	Upgrade control plane to v1.28.3 
+2.	Upgrade worker node to v1.28.3 
+3.	Validate upgrade, by creating a pod  
+ 
+Step 1: Upgrade control plane to v1.28.3 
+ 
+sudo apt update 
+sudo apt-cache madison kubeadm 
+ 
+ 
+ 
+Pick latest version from previous output, We are choosing 1.28.3-1.1 version for upgrade 
+ 
+sudo apt-mark unhold kubeadm 
+sudo apt-get update 
+sudo apt-get install -y kubeadm='1.28.3-1.1' 
+sudo apt-mark hold kubeadm 
+ 
+ 
+ 
+ 
+ 
+ 
+kubeadm version 
+ 
+ 
+ 
+ 
+sudo kubeadm upgrade plan 
+ 
+ 
+ 
+ 
+sudo kubeadm upgrade apply v1.28.3 
+ 
+ 
+ 
+ 
+ 
+ 
+kubectl drain master.example.com --ignore-daemonsets 
+ 
+ 
+ 
+ 
+ 
+sudo apt-mark unhold kubelet kubectl 
+sudo apt-get update 
+sudo apt-get install -y kubelet='1.28.3-1.1' kubectl='1.28.3-1.1' 
+sudo apt-mark hold kubelet kubectl 
+ 
+ 
+ 
+ 
+ 
+ 
+kubectl get nodes 
+ 
+ 
+ 
+ 
+sudo systemctl daemon-reload 
+sudo systemctl restart kubelet 
+ 
+kubectl uncordon master.example.com 
+ 
+kubectl get nodes 
+ 
+ 
+ 
+ 
+Step 2: Upgrade worker node to v1.28.3 
+ 
+On the Worker node, 
+sudo apt-get update 
+ 
+ 
+ 
+sudo apt-mark unhold kubeadm 
+sudo apt-get update 
+sudo apt-get install -y kubeadm='1.28.3-1.1' 
+sudo apt-mark hold kubeadm 
+ 
+ 
+ 
+ 
+ 
+kubeadm version 
+ 
+ 
+ 
+sudo kubeadm upgrade node 
+ 
+ 
+ 
+On the Master node, 
+kubectl drain ip-172-31-29-25 --ignore-daemonsets --delete-emptydir-data 
+ 
+Note: While executing the above drain command, if there are pods cannot be deleted, 
+Error message: cannot delete Pods declare no controller (use --force to override):  
+ 
+ 
+ 
+Use the below command, 
+kubectl drain ip-172-31-29-25 --ignore-daemonsets --delete-emptydir-data - - force 
+ 
+ 
+ 
+On the Worker node, 
+sudo apt-mark unhold kubelet kubectl 
+sudo apt-get update 
+sudo apt-get install -y kubelet='1.28.3-1.1' kubectl='1.28.3-1.1'  
+sudo apt-mark hold kubelet kubectl 
+ 
+ 
+ 
+ 
+ 
+sudo systemctl daemon-reload 
+sudo systemctl restart kubelet 
+ 
+ 
+ 
+On the Master node, 
+kubectl uncordon ip-172-31-29-25 
+kubectl get nodes 
+ 
+ 
+ 
+Cluster and Worker nodes are successfully upgraded to v1.28.3. 
+Step 3: Validate cluster upgrade, by creating pod 
+ 
+On the Master node, 
+ 
+kubectl run test-pod --image nginx --port 80 
+ 
+ 
+ 
+kubectl get pods -o wide 
+ 
