@@ -8,3 +8,4 @@ exportfs -rv
 systemctl restart nfs-kernel-server
 apt -y update
 apt -y install nfs-common
+echo "sed -i 's/SERVER_IPv4/`hostname -i`/g' mysql.yaml" > 2_k8s_dashboard_1.sh
