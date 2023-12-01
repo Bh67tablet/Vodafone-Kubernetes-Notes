@@ -10,6 +10,7 @@ kubectl get svc -n kubernetes-dashboard -o wide
 kubectl apply -f ServiceAccount.yaml
 kubectl create -f token.yml
 kubectl apply -f ClusterRoleBinding.yaml
+kubectl -n kubernetes-dashboard describe secret mysecretname
 #
 sed -i 's/SERVER_IPv4/echo `hostname -i`/g' mysql.yaml
 #
