@@ -14,3 +14,5 @@ kubectl -n kubernetes-dashboard describe secret mysecretname
 #
 sed -i 's/SERVER_IPv4/echo `hostname -i`/g' mysql.yaml
 #
+kubectl apply -f mysql.yml
+kubectl apply -f wordpress.yml
